@@ -1,0 +1,12 @@
+.DS_Store
+.classpath
+.settings/
+.project
+.gradle
+build/
+bin/
+target/
+*.iml
+*.ipr
+*.iws
+gradle.properties

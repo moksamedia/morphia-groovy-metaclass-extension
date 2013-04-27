@@ -4,7 +4,11 @@ import java.lang.reflect.Field;
 
 import com.github.jmkgreen.morphia.mapping.MappedField
 
-
+/*
+ * Had to override MappedField to hook into the getFieldValue() and 
+ * setFieldValue() methods so that metaClass support could be 
+ * incorporated.
+ */
 class MappedMetaClassField extends MappedField {
 
 	MappedMetaClassField(Field f, Class<?> clazz) {

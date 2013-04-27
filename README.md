@@ -4,64 +4,72 @@ Entity and Embedded classes.
 
 For example:
 
-@Entity
-class BlogPost {
+	@Entity
+	class BlogPost {
 	
-	@Reference User user
-	String content
+		@Reference User user
+		String content
 	
-}
+	}
 
 Now we would like to add comments to the BlogPost at runtime in a plugin architecture
 via the groovy expando-metaclass. How can we do this?
 
-We define the comment class:
+We define the comment class (this is just a normal Morphia entity class):
 
-@Entity
-class Comment {
+	@Entity
+	class Comment {
 	
-	@Reference User commenter
-	String text
+		@Reference User commenter
+		String text
 	
-}
+	}
 
-And then define the expander class:
+And then define the expander class. The class itself here is arbitrary; what's
+important is the @ClassToExpand(BlogPost) which marks the class as an expander class 
+and tells the extension which class we're expading. The fields contained within, 
+which are annotated just as in a normal Morphia class, define the fields we will
+inject within the expanded class, in this case, a BlogPost:
 
-@ClassToExpand(BlogPost) 
-class BlogPostExpander { // name here is arbitrary
+	@ClassToExpand(BlogPost) 
+	class BlogPostExpander { // name here is arbitrary
 	
-	List<Comment> comments
+		List<Comment> comments
 	
-}
+	}
 
 Default values can also be specified, as well as embedded and referenced types:
 
-@ClassToExpand(BlogPost) 
-class BlogPostExpander { // name here is arbitrary
+	@ClassToExpand(BlogPost) 
+	class BlogPostExpander { // name here is arbitrary
 	
-	@Embedded
-	EmbeddedType prop = null
+		@Embedded
+		EmbeddedType prop = null
 	
-	@Reference
-	ReferencedTyep prop
+		@Reference
+		ReferencedTyep prop
 	
-	int someVal = 5
+		int someVal = 5
 	
-	String aName = "A name"
+		String aName = "A name"
 	
-}
+	}
 
 
 
 Somewhere in our initialization (after mongo and morphia have been initialized):
 
-GroovyMetaClassExtension ext = new GroovyMetaClassExtension(morphia) // initialize the extension (tells morphia about its existence)
-ext.load(BlogPostExpander) // tell the extension about the expander class
+	GroovyMetaClassExtension ext = new GroovyMetaClassExtension(morphia) // initialize the extension (tells morphia about its existence)
+	ext.load(BlogPostExpander) // tell the extension about the expander class
 
 Now, whenever a BlogPost is saved or loaded, the comments property will automatically be
 inserted into the metaclass and saved and loaded along with the BlogPost class (in the
 same database table).
 
+
+---
+
+Implementation:
 
 The challenge here was two-fold: 
 1) morphia is natively java, and as such had not conception of the metaClass, which was effectively
